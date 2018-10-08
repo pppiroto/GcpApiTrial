@@ -27,10 +27,12 @@
         android:text="@string/nav_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
+    <!-- // https://sandragon.hatenablog.com/entry/2013/07/09/014639 -->
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textCurrentUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:clickable="true"
         android:text="@string/nav_header_subtitle" />
 
 </LinearLayout>

@@ -31,4 +31,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    // https://teratail.com/questions/119882
+    implementation 'com.google.firebase:firebase-auth:11.6.0'
 }
+
+// https://stackoverflow.com/questions/33572465/gradle-errorexecution-failed-for-task-appprocessdebuggoogleservices
+// You should delete a line apply plugin: 'com.google.gms.google-services'
+// because "com.android.application" package already has same package.
+// https://stackoverflow.com/questions/40081539/default-firebaseapp-is-not-initialized
+apply plugin: 'com.google.gms.google-services'
+
+// https://kotlinlang.org/docs/tutorials/android-plugin.html
+apply plugin: 'kotlin-android-extensions'

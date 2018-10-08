@@ -1,26 +1,48 @@
 package info.typea.gcpapitrial
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
+import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    companion object {
+        const val TAG: String = "*** MainActivity ***";
+    }
+
+    // FirebaseAuth 1.FirebaseAuthインスタンスの宣言
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // FirebaseAuth 2.初期化
+        mAuth = FirebaseAuth.getInstance()
+
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
+        }
+
+        nav_view.getHeaderView(0).textCurrentUser.setOnClickListener { view ->
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         val toggle = ActionBarDrawerToggle(
@@ -29,6 +51,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // FirebaseAuth 3.Activity初期化時にサインインチェック
+        var currentUser = mAuth?.currentUser
+
+        if (currentUser == null) {
+            var intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
+        updateUI(mAuth?.currentUser)
+    }
+
+    private fun updateUI(currentUser: FirebaseUser?) {
+        Log.i(TAG,"uid=${currentUser?.uid},name=${currentUser?.displayName},email=${currentUser?.email}");
+
+        // https://stackoverflow.com/questions/33540090/textview-from-navigationview-header-returning-null
+        nav_view.getHeaderView(0).textCurrentUser.text = currentUser?.email?:getString(R.string.nav_header_subtitle)
     }
 
     override fun onBackPressed() {
@@ -75,6 +117,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_send -> {
 
+            }
+            R.id.nav_logout -> {
+                mAuth?.signOut()
+                updateUI(mAuth?.currentUser)
             }
         }
 
