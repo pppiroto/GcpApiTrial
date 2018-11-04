@@ -1,23 +1,26 @@
 package info.typea.gcpapitrial
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
-import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     companion object {
@@ -110,7 +113,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.nav_manage -> {
-
+                var intent = Intent(this, FunctionCheckActivity::class.java)
+                startActivity(intent)
             }
             R.id.nav_share -> {
 
@@ -119,8 +123,43 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.nav_logout -> {
-                mAuth?.signOut()
-                updateUI(mAuth?.currentUser)
+//                mAuth?.signOut()
+//                updateUI(mAuth?.currentUser)
+
+                // カテゴリー名（通知設定画面に表示される情報）
+                val notificationCategoryName = "GCP Api Trial App"
+                val notificationTitle = "TITLE"
+                val notificationContent = "CONTENT"
+                // システムに登録するChannelのID
+                val channelId = "gcp_api_trial_channel_id"
+                var builder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // https://qiita.com/naoi/items/367fc23e55292c50d459
+
+                    // 通知の詳細情報（通知設定画面に表示される情報）
+                    val notifyDescription = "この通知の詳細情報を設定します"
+                    // Channelの取得と生成
+                    if (notificationManager.getNotificationChannel(channelId) == null) {
+                        val channel = NotificationChannel(channelId, notificationCategoryName, NotificationManager.IMPORTANCE_HIGH)
+                        channel.apply {
+                            description = notifyDescription
+                        }
+                        notificationManager.createNotificationChannel(channel)
+                    }
+                }
+
+                var notification = builder.apply {
+                    setSmallIcon(android.R.drawable.sym_def_app_icon)
+                    setContentTitle(notificationTitle)
+                    setContentText(notificationContent)
+                }.build()
+
+                // 第1引数は通知を識別
+                // 後から更新したり、削除が可能
+                notificationManager.notify(1, notification)
+
             }
         }
 
